@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Status Tracker</title>
+    <style>
+        :root {
+            --color-primary: #2180A3;
+            --color-primary-hover: #1d746e;
+            --color-primary-active: #1a6873;
+            --color-bg: #fcfcf9;
+            --color-surface: #ffffff;
+            --color-text: #134252;
+            --color-text-secondary: #626c6d;
+            --color-border: #5e5240;
+            --color-success: #208D8D;
+            --color-error: #c01531;
+            --color-warning: #a84b2f;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-24: 24px;
+            --radius-base: 8px;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: var(--space-16);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: var(--space-24);
+        }
+
+        h1 {
+            margin: 0 0 var(--space-8) 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .date-display {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-12);
+            margin-bottom: var(--space-24);
+        }
+
+        .stat-card {
+            background: var(--color-surface);
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            border: 1px solid rgba(94, 82, 64, 0.2);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--space-8);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .controls {
+            display: flex;
+            gap: var(--space-12);
+            margin-bottom: var(--space-24);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-12) var(--space-16);
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 250ms;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: #fcfcf9;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--color-error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #a01229;
+        }
+
+        .input-group {
+            display: flex;
+            gap: var(--space-8);
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 150px;
+            padding: var(--space-12);
+            border: 1px solid rgba(94, 82, 64, 0.2);
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            background-color: var(--color-surface);
+            color: var(--color-text);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(33, 128, 163, 0.1);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            background: var(--color-surface);
+            border-radius: var(--radius-base);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(94, 82, 64, 0.12);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background-color: rgba(94, 82, 64, 0.05);
+            border-bottom: 2px solid rgba(94, 82, 64, 0.2);
+        }
+
+        th {
+            padding: var(--space-12);
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        td {
+            padding: var(--space-12);
+            border-bottom: 1px solid rgba(94, 82, 64, 0.1);
+        }
+
+        tbody tr:hover {
+            background-color: rgba(33, 128, 163, 0.03);
+        }
+
+        .toggle-switch {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 32px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 200ms;
+            color: white;
+        }
+
+        .toggle-switch.on {
+            background-color: var(--color-success);
+            box-shadow: 0 0 12px rgba(32, 141, 141, 0.4);
+        }
+
+        .toggle-switch.off {
+            background-color: #999;
+            box-shadow: 0 0 12px rgba(153, 153, 153, 0.2);
+        }
+
+        .toggle-switch:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-delete {
+            background-color: var(--color-error);
+            color: white;
+            padding: var(--space-8) var(--space-12);
+            border-radius: var(--radius-base);
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 250ms;
+        }
+
+        .btn-delete:hover {
+            background-color: #a01229;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-24);
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-12);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ Meal Status Tracker</h1>
+            <div class="date-display" id="dateDisplay"></div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Members</div>
+                <div class="stat-value" id="totalCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Meal ON</div>
+                <div class="stat-value" id="onCount" style="color: var(--color-success);">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Meal OFF</div>
+                <div class="stat-value" id="offCount" style="color: var(--color-error);">0</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="memberInput" 
+                    placeholder="Enter member name..." 
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button class="btn btn-primary" onclick="addMember()">Add Member</button>
+            </div>
+            <button class="btn btn-danger" onclick="clearAllData()">Clear All Data</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 30px;">#</th>
+                        <th>Member Name</th>
+                        <th style="width: 120px;">Meal Status</th>
+                        <th style="width: 80px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="memberTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="emptyMessage" class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>No members added yet. Add your first member above!</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data
+        let members = [];
+
+        function loadData() {
+            const saved = localStorage.getItem('mealTrackerData');
+            if (saved) {
+                try {
+                    members = JSON.parse(saved);
+                } catch (e) {
+                    members = [];
+                }
+            }
+            renderTable();
+            updateStats();
+            updateDateDisplay();
+        }
+
+        function saveData() {
+            localStorage.setItem('mealTrackerData', JSON.stringify(members));
+        }
+
+        function updateDateDisplay() {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = today.toLocaleDateString('en-US', options);
+            document.getElementById('dateDisplay').textContent = `Today: ${dateStr}`;
+        }
+
+        function addMember() {
+            const input = document.getElementById('memberInput');
+            const name = input.value.trim();
+
+            if (!name) {
+                alert('Please enter a member name');
+                return;
+            }
+
+            if (members.some(m => m.name.toLowerCase() === name.toLowerCase())) {
+                alert('This member already exists');
+                return;
+            }
+
+            members.push({
+                id: Date.now(),
+                name: name,
+                status: true, // true = ON, false = OFF
+                addedDate: new Date().toISOString()
+            });
+
+            input.value = '';
+            saveData();
+            renderTable();
+            updateStats();
+            input.focus();
+        }
+
+        function toggleStatus(id) {
+            const member = members.find(m => m.id === id);
+            if (member) {
+                member.status = !member.status;
+                saveData();
+                renderTable();
+                updateStats();
+            }
+        }
+
+        function removeMember(id) {
+            members = members.filter(m => m.id !== id);
+            saveData();
+            renderTable();
+            updateStats();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                addMember();
+            }
+        }
+
+        function updateStats() {
+            const total = members.length;
+            const onCount = members.filter(m => m.status === true).length;
+            const offCount = members.filter(m => m.status === false).length;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('onCount').textContent = onCount;
+            document.getElementById('offCount').textContent = offCount;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('memberTableBody');
+            const emptyMessage = document.getElementById('emptyMessage');
+
+            if (members.length === 0) {
+                tbody.innerHTML = '';
+                emptyMessage.style.display = 'block';
+                return;
+            }
+
+            emptyMessage.style.display = 'none';
+            tbody.innerHTML = members.map((member, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${escapeHtml(member.name)}</td>
+                    <td>
+                        <button 
+                            class="toggle-switch ${member.status ? 'on' : 'off'}"
+                            onclick="toggleStatus(${member.id})"
+                        >
+                            ${member.status ? 'ON' : 'OFF'}
+                        </button>
+                    </td>
+                    <td>
+                        <button class="btn-delete" onclick="removeMember(${member.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                members = [];
+                saveData();
+                renderTable();
+                updateStats();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load data on page load
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
